@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(VKResponse response) {
                             VKWallPostResult result = (VKWallPostResult) response.parsedModel;
-                            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("https://vk.com/wall-%d_%s", TARGET_GROUP, result.post_id)));
+                            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("https://vk.com/commenthere", TARGET_GROUP, result.post_id)));//wall-%d_%s
                             startActivity(i);
                     }
 
@@ -101,44 +101,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-
-
-
-
-
-
-
-
-                /*final Bitmap photo = getPhoto();
-                VKRequest request1 = VKApi.uploadWallPhotoRequest(new VKUploadImage(
-                        photo, VKImageParameters.jpgImage(0.9f)), 0,178341408);//60479154
-                request1.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        super.onComplete(response);
-                        Toast.makeText(getApplicationContext(), "Пользователь успешно загрузил фото",
-                                Toast.LENGTH_LONG).show();
-                    }
-                });*/
-
-
-
-               /* listView = (ListView) findViewById(R.id.listView);
-
-                VKRequest request = VKApi.friends().get(VKParameters.from(
-                        VKApiConst.FIELDS, "first_name,last_name"));
-                    request.executeWithListener(new VKRequest.VKRequestListener() {
-                        @Override
-                        public void onComplete(VKResponse response) {
-                            super.onComplete(response);
-
-                            VKList list = (VKList) response.parsedModel;
-
-                            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                                    MainActivity.this, android.R.layout.simple_expandable_list_item_1,list);
-                            listView.setAdapter(arrayAdapter);
-                        }
-                    });*/
             }
             @Override
             public void onError(VKError error) {
@@ -152,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Bitmap getPhoto() {
         try {
-            return BitmapFactory.decodeStream(this.getAssets().open("android_vk.jpg"));
+            return BitmapFactory.decodeStream(this.getAssets().open("android_vk.jpg"));//CLOSE delete vkK android_vk.jpg
         } catch (IOException e) {
             e.printStackTrace();
             return null;

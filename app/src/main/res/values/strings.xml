@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">VkUploadImage</string>
+    <string name="continue_using_app">continue using app</string>
+    <string name="action_sign_in_short">action sign in short</string>
+    <string name="logout">logout</string>
     <integer name="com_vk_sdk_AppId">5489034</integer>
 </resources>
