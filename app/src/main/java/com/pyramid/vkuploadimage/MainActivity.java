@@ -9,6 +9,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -61,24 +64,40 @@ public class MainActivity extends AppCompatActivity {
 
                 Toast.makeText(getApplicationContext(), "Пользователь успешно авторизовался",
                         Toast.LENGTH_LONG).show();
+                final CheckBox checkBoxWall = (CheckBox) findViewById(R.id.checkBoxWall);
+                if (checkBoxWall.isChecked()) {
 
+                    checkBoxWall.setChecked(false);
+                }
+                final Button button = (Button) findViewById(R.id.buttonStart);
+                button.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
 
+                        if (checkBoxWall.isChecked()) {
+                        final Bitmap photo = getPhoto();
+                        VKRequest request = VKApi.uploadWallPhotoRequest(new VKUploadImage(photo, VKImageParameters.jpgImage(0.9f)), 0, TARGET_GROUP);
+                        request.executeWithListener(new VKRequest.VKRequestListener() {
+                            @Override
+                            public void onComplete(VKResponse response) {
+                                recycleBitmap(photo);
+                                VKApiPhoto photoModel = ((VKPhotoArray) response.parsedModel).get(0);
+                                makePost(new VKAttachments(photoModel));
+                            }
 
-                final Bitmap photo = getPhoto();
-                VKRequest request = VKApi.uploadWallPhotoRequest(new VKUploadImage(photo, VKImageParameters.jpgImage(0.9f)), 0, TARGET_GROUP);
-                request.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        recycleBitmap(photo);
-                        VKApiPhoto photoModel = ((VKPhotoArray) response.parsedModel).get(0);
-                        makePost(new VKAttachments(photoModel));
-                    }
-
-                    @Override
-                    public void onError(VKError error) {
-                        showError(error);
+                            @Override
+                            public void onError(VKError error) {
+                                showError(error);
+                            }
+                        });
+                            Toast.makeText(getApplicationContext(), "Photos had been uploaded",
+                                    Toast.LENGTH_LONG).show();
+                    } else {//debug
+                            Toast.makeText(getApplicationContext(), "Photos had not been uploaded",
+                                    Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
+
             }
 
             private void makePost(VKAttachments attachments) {

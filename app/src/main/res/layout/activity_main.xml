@@ -5,8 +5,33 @@
     android:layout_height="match_parent"
     tools:context="com.pyramid.vkuploadimage.MainActivity">
 
-    <ListView
+
+    <CheckBox
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/listView"></ListView>
+        android:text="Wall"
+        android:id="@+id/checkBoxWall"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="46dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        android:id="@+id/buttonStart"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="178dp" />
+
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Album"
+        android:id="@+id/checkBox_2"
+        android:layout_below="@+id/checkBoxAlbum"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="60dp" />
 </RelativeLayout>
