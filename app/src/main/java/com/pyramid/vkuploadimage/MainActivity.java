@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.vk.sdk.VKAccessToken;
@@ -45,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
             VKScope.DOCS
     };
 
-    private ListView  listView;
-    public static final int TARGET_GROUP = 178341408;
+    public static final int TARGET_USER = 178341408;
+    public static final int TARGET_ALBUM = 419340559;//TARGET_USER;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,39 +61,73 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResult(VKAccessToken res) {
 
-                Toast.makeText(getApplicationContext(), "Пользователь успешно авторизовался",
+                Toast.makeText(getApplicationContext(), "User successfully login",
                         Toast.LENGTH_LONG).show();
+
                 final CheckBox checkBoxWall = (CheckBox) findViewById(R.id.checkBoxWall);
+                assert checkBoxWall != null;
                 if (checkBoxWall.isChecked()) {
 
                     checkBoxWall.setChecked(false);
                 }
+
+                final CheckBox checkBoxAlbum = (CheckBox) findViewById(R.id.checkBoxAlbum);
+                assert checkBoxAlbum != null;
+                if (checkBoxAlbum.isChecked()) {
+
+                    checkBoxAlbum.setChecked(false);
+                }
+
                 final Button button = (Button) findViewById(R.id.buttonStart);
+                assert button != null;
                 button.setOnClickListener(new View.OnClickListener() {
+
                     public void onClick(View v) {
-
                         if (checkBoxWall.isChecked()) {
-                        final Bitmap photo = getPhoto();
-                        VKRequest request = VKApi.uploadWallPhotoRequest(new VKUploadImage(photo, VKImageParameters.jpgImage(0.9f)), 0, TARGET_GROUP);
-                        request.executeWithListener(new VKRequest.VKRequestListener() {
-                            @Override
-                            public void onComplete(VKResponse response) {
-                                recycleBitmap(photo);
-                                VKApiPhoto photoModel = ((VKPhotoArray) response.parsedModel).get(0);
-                                makePost(new VKAttachments(photoModel));
-                            }
+                            final Bitmap photo = getPhoto();
+                            VKRequest request = VKApi.uploadWallPhotoRequest(new VKUploadImage(photo,
+                                    VKImageParameters.jpgImage(0.9f)), 0, TARGET_USER);
+                            request.executeWithListener(new VKRequest.VKRequestListener() {
 
-                            @Override
-                            public void onError(VKError error) {
-                                showError(error);
-                            }
-                        });
-                            Toast.makeText(getApplicationContext(), "Photos had been uploaded",
-                                    Toast.LENGTH_LONG).show();
-                    } else {//debug
-                            Toast.makeText(getApplicationContext(), "Photos had not been uploaded",
+                                @Override
+                                public void onComplete(VKResponse response) {
+                                    recycleBitmap(photo);
+                                    VKApiPhoto photoModel = ((VKPhotoArray) response.parsedModel).get(0);
+                                    makePost(new VKAttachments(photoModel));
+                                }
+
+                                @Override
+                                public void onError(VKError error) {
+                                    showError(error);
+                                }
+                            });
+                            Toast.makeText(getApplicationContext(), "Photos had been uploaded to wall",
                                     Toast.LENGTH_LONG).show();
                         }
+                        if (checkBoxAlbum.isChecked()) {
+                            final Bitmap photo = getPhoto();
+                            VKRequest request = VKApi.uploadAlbumPhotoRequest(new VKUploadImage(photo,
+                                    VKImageParameters.pngImage()), TARGET_USER, 0);
+                            request.executeWithListener(new VKRequest.VKRequestListener() {
+
+                                @Override
+                                public void onComplete(VKResponse response) {
+                                    recycleBitmap(photo);
+                                    VKPhotoArray photoArray = (VKPhotoArray) response.parsedModel;
+                                    Intent i = new Intent(Intent.ACTION_VIEW,
+                                            Uri.parse(String.format("https://vk.com/photo%d_%s", "TARGET_USER", photoArray.get(0).id)));
+                                    startActivity(i);
+                                }
+
+                                @Override
+                                public void onError(VKError error) {
+                                    super.onError(error);
+                                }
+                            });
+                            Toast.makeText(getApplicationContext(), "Photos had been uploaded to wall",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
                     }
                 });
 
@@ -103,15 +136,19 @@ public class MainActivity extends AppCompatActivity {
             private void makePost(VKAttachments attachments) {
                 makePost(attachments, null);
             }
+
             private void makePost(VKAttachments attachments, String message) {
-                VKRequest post = VKApi.wall().post(VKParameters.from(VKApiConst.OWNER_ID, + TARGET_GROUP, VKApiConst.ATTACHMENTS, attachments, VKApiConst.MESSAGE, message));
+                VKRequest post = VKApi.wall().post(VKParameters.from(VKApiConst.OWNER_ID, +
+                        TARGET_USER, VKApiConst.ATTACHMENTS, attachments, VKApiConst.MESSAGE, message));
                 post.setModelClass(VKWallPostResult.class);
                 post.executeWithListener(new VKRequest.VKRequestListener() {
+
                     @Override
                     public void onComplete(VKResponse response) {
-                            VKWallPostResult result = (VKWallPostResult) response.parsedModel;
-                            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("https://vk.com/commenthere", TARGET_GROUP, result.post_id)));//wall-%d_%s
-                            startActivity(i);
+                        VKWallPostResult result = (VKWallPostResult) response.parsedModel;
+                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("https://vk.com/wall%d_%s",
+                                TARGET_USER, result.post_id)));
+                        startActivity(i);
                     }
 
                     @Override
@@ -121,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
             }
+
             @Override
             public void onError(VKError error) {
                 Toast.makeText(getApplicationContext(), "Произошла ошибка авторизации (например," +
@@ -133,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Bitmap getPhoto() {
         try {
-            return BitmapFactory.decodeStream(this.getAssets().open("android_vk.jpg"));//CLOSE delete vkK android_vk.jpg
+            return BitmapFactory.decodeStream(this.getAssets().open("android_vk.jpg"));
         } catch (IOException e) {
             e.printStackTrace();
             return null;
